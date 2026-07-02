@@ -261,11 +261,11 @@
                 </label>
             </div>
 
-            <button type="button" class="btn-primary" onclick="confirmerEtLancer()">Enregistrer et lancer la borne</button>
+            <button type="button" class="btn-primary" onclick="confirmerEtLancer()">🚀 Enregistrer et lancer la borne</button>
         </div>
 
         <div id="scan-screen">
-            <div class="status-badge">PRÊT À SCANNER</div>
+            <div class="status-badge">🔒 MODE BORNE PUBLIC — PRÊT À SCANNER</div>
             <div class="camera-box-wrapper">
                 <div id="reader"></div>
             </div>
@@ -333,6 +333,7 @@
             const confirmation = confirm("Lancer la borne ? Les réglages seront verrouillés.");
             if (!confirmation) return;
 
+            // CONFIGURATION ENREGISTRÉE
             configBorne.duration = parseInt(document.getElementById('input-duration').value, 10) || 5;
             configBorne.sound = document.getElementById('switch-sound').checked;
             configBorne.vibrate = document.getElementById('switch-vibrate').checked;
@@ -340,11 +341,13 @@
 
             localStorage.setItem('borne_config', JSON.stringify(configBorne));
 
+            // EXÉCUTION DU PLEIN ÉCRAN APRÈS LE CONFIRM (Plus de perturbation du message)
             if (configBorne.fullscreen) {
                 forcerPleinEcran();
             }
 
             document.getElementById('setup-screen').style.display = 'none';
+            // Utilisation de 'flex' pour appliquer le centrage CSS parfait de la caméra
             document.getElementById('scan-screen').style.display = 'flex';
 
             lancerLeScanner();
@@ -388,6 +391,7 @@
             }
 
             if (estUrl) {
+                // RECONSTRUCTION ET CORRECTION LIENS GOOGLE DRIVE (Aperçu Iframe Intégrable Canonique)
                 if (cleanContent.includes("drive.google.com")) {
                     let fileId = "";
                     
@@ -402,6 +406,7 @@
                     }
                     targetContainer.innerHTML = `<iframe class="scanned-iframe" src="${cleanContent}" allow="autoplay"></iframe>`;
                 }
+                // Traitement YouTube
                 else if (cleanContent.includes("youtube.com/watch") || cleanContent.includes("youtu.be")) {
                     let videoId = "";
                     if (cleanContent.includes("v=")) {
