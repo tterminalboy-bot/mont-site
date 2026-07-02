@@ -134,6 +134,7 @@
         #scan-screen {
             display: none;
             width: 100%;
+            min-height: 70vh;
             flex-direction: column;
             align-items: center;
             justify-content: center;
@@ -148,16 +149,23 @@
             border: 4px solid #00adb5;
             position: relative;
             box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         #reader {
             width: 100% !important;
             height: 100% !important;
             border: none !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
         }
         #reader video {
             width: 100% !important;
             height: 100% !important;
             object-fit: cover !important;
+            border-radius: 20px;
         }
         .status-badge {
             display: inline-block;
@@ -167,7 +175,7 @@
             border-radius: 30px;
             font-size: 0.85rem;
             font-weight: bold;
-            margin-bottom: 25px;
+            margin-bottom: 20px; /* Espace fixe sous le texte */
         }
 
         /* --- PAGE EN OVERLAY PLEIN ÉCRAN TOTAL --- */
@@ -233,7 +241,7 @@
             <h1>Configuration Borne</h1>
             
             <div class="form-group">
-                <label for="input-duration">🔴 Durée d'affichage avant retour au scan (secondes) 🔴</label>
+                <label for="input-duration">Durée d'affichage avant retour au scan (secondes)</label>
                 <input type="number" id="input-duration" min="2" max="60" value="5">
             </div>
 
@@ -261,7 +269,7 @@
                 </label>
             </div>
 
-            <button type="button" class="btn-primary" onclick="confirmerEtLancer()">Enregistrer et lancer la borne</button>
+            <button type="button" class="btn-primary" onclick="confirmerEtLancer()">🚀 Enregistrer et lancer la borne</button>
         </div>
 
         <div id="scan-screen">
@@ -279,7 +287,7 @@
     </div>
 
     <script>
-        let html5QrCode;
+        let html5QrCode = null;
         let configBorne = { duration: 5, sound: true, vibrate: true, fullscreen: true };
         let timerRetour;
 
@@ -333,7 +341,6 @@
             const confirmation = confirm("Lancer la borne ? Les réglages seront verrouillés.");
             if (!confirmation) return;
 
-            // CONFIGURATION ENREGISTRÉE
             configBorne.duration = parseInt(document.getElementById('input-duration').value, 10) || 5;
             configBorne.sound = document.getElementById('switch-sound').checked;
             configBorne.vibrate = document.getElementById('switch-vibrate').checked;
@@ -341,21 +348,22 @@
 
             localStorage.setItem('borne_config', JSON.stringify(configBorne));
 
-            // EXÉCUTION DU PLEIN ÉCRAN APRÈS LE CONFIRM (Plus de perturbation du message)
             if (configBorne.fullscreen) {
                 forcerPleinEcran();
             }
 
             document.getElementById('setup-screen').style.display = 'none';
-            // Utilisation de 'flex' pour appliquer le centrage CSS parfait de la caméra
             document.getElementById('scan-screen').style.display = 'flex';
 
             lancerLeScanner();
         }
 
         function lancerLeScanner() {
-            html5QrCode = new Html5Qrcode("reader");
-            const configScan = { fps: 20, qrbox: { width: 220, height: 220 } };
+            if (!html5QrCode) {
+                html5QrCode = new Html5Qrcode("reader");
+            }
+            
+            const configScan = { fps: 25, qrbox: 220 };
 
             html5QrCode.start({ facingMode: "environment" }, configScan, onScanSuccess)
             .catch(err => {
@@ -391,22 +399,18 @@
             }
 
             if (estUrl) {
-                // RECONSTRUCTION ET CORRECTION LIENS GOOGLE DRIVE (Aperçu Iframe Intégrable Canonique)
                 if (cleanContent.includes("drive.google.com")) {
                     let fileId = "";
-                    
                     if (cleanContent.includes("/d/")) {
                         fileId = cleanContent.split('/d/')[1].split('/')[0];
                     } else if (cleanContent.includes("id=")) {
                         fileId = cleanContent.split('id=')[1].split('&')[0];
                     }
-                    
                     if (fileId) {
                         cleanContent = `https://docs.google.com/file/d/${fileId}/preview`;
                     }
                     targetContainer.innerHTML = `<iframe class="scanned-iframe" src="${cleanContent}" allow="autoplay"></iframe>`;
                 }
-                // Traitement YouTube
                 else if (cleanContent.includes("youtube.com/watch") || cleanContent.includes("youtu.be")) {
                     let videoId = "";
                     if (cleanContent.includes("v=")) {
