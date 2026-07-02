@@ -444,7 +444,7 @@
         function lancerCompteALebours() {
             let tempsRestant = configBorne.duration;
             const label = document.getElementById('countdown-label');
-            label.innerText = `⏱️ Fermeture de la page et retour au scan dans ${tempsRestant}s...`;
+            label.innerText = `⏱️ Fermeture de la page et retour au scan dans ${tempsRestant}s`;
             
             clearInterval(timerRetour);
             timerRetour = setInterval(() => {
@@ -453,7 +453,7 @@
                     clearInterval(timerRetour);
                     fermerPageOverlay();
                 } else {
-                    label.innerText = `⏱️ Fermeture de la page et retour au scan dans ${tempsRestant}s...`;
+                    label.innerText = `⏱️ Fermeture de la page et retour au scan dans ${tempsRestant}s`;
                 }
             }, 1000);
         }
